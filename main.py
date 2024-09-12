@@ -14,6 +14,11 @@ import matplotlib.pyplot as plt
 from tkcalendar import Calendar, DateEntry
 from datetime import date
 
+from tkinter import messagebox as MessageBox
+
+# Importar funções da view
+from view import *
+
 
 # ################# cores ###############
 co0 = "#2e2d2b"  
@@ -62,6 +67,73 @@ img = ImageTk.PhotoImage(img)
 img_logo = Label(frame1, image=img, text=' Orçamento Pessoal', width=900, compound=LEFT, padx=5, relief='raised', anchor='nw', font=('Verdana 20 bold'), bg=co1, fg=co4)
 img_logo.place(x=0, y=0)
 
+
+
+
+
+# Back End - Funções_________________
+global tree
+
+def adicionar_categoria():
+    nome = inserir_categoria.get()  # Obtém o nome da categoria do campo de texto
+    
+    if nome == '':
+        MessageBox.showinfo('Erro', 'Preencha o campo')  # Valida se o campo está vazio
+        return
+
+    # Insere a nova categoria no banco de dados (renomeie a função para evitar o conflito)
+    adicionar_categoria_no_bd(nome)
+    
+    MessageBox.showinfo('Sucesso', 'Categoria adicionada com sucesso')
+    
+    inserir_categoria.delete(0, END)  # Limpa o campo de entrada após a inserção
+    
+    # Pega os valores da categoria atualizados
+    categorias = ver_categoria()  # Aqui usamos uma variável diferente do nome da função
+    
+    # Atualiza a lista de categorias no ComboBox
+    lista_categorias = []
+    
+    for i in categorias:
+        lista_categorias.append(i[1])  # Adiciona o nome da categoria à lista
+    
+    # Atualiza a combobox de categorias com a nova lista
+    combo_categoria_despesas['values'] = lista_categorias
+
+def adicionar_receita():
+    nome = 'Receita'
+    data = calendario_receita.get()  # Obtém a data da receita
+    valor = valor_receitas.get()  # Obtém o valor da receita
+    
+    # Lista com os dados para inserção
+    lista_inserir = [nome, data, valor]
+    
+    # Verifica se algum dos campos está vazio
+    for i in lista_inserir:
+        if i == '':
+            MessageBox.showinfo('Erro', 'Preencha todos os campos')  # Mostra erro se houver campos vazios
+            return
+    
+    # Chama a função correta para adicionar a receita ao banco de dados ou sistema de armazenamento
+    adicionar_receita_no_bd(nome, data, valor)
+    
+    # Exibe uma mensagem de sucesso
+    MessageBox.showinfo('Sucesso', 'Receita adicionada com sucesso')
+
+    # Limpa os campos após a inserção
+    valor_receitas.delete(0, END)
+    calendario_receita.delete(0, END)
+    
+    mostrar_renda()  # Atualiza a tabela de renda
+    percentual()  # Atualiza o percentual de gastos
+    grafico_barra()  # Atualiza o gráfico de barras
+    grafico_pizza()  # Atualiza o gráfico de pizza
+    resumo()  # Atualiza o resumo
+
+def adicionar_despesa():
+  
+
+# FIM Back End - Funções_________________
 
 # percentual de gastos
 
@@ -237,7 +309,7 @@ def mostrar_renda():
 
 mostrar_renda()
 
-# Configurações de despesas
+# ----------------------------Configurações de despesas--------------------------------
 label_info = Label(frame3_2, text='Insira novas Despesas', font=('Verdana 10 bold'), bg=co1, fg=co4, anchor='nw')
 label_info.place(x=10, y=10)
 
@@ -252,15 +324,13 @@ for i in lista_categoria:
     categoria.append(i[1]) # Adiciona o valor da categoria
 
 combo_categoria_despesas = ttk.Combobox(frame3_2, width=10, font=('Ivy 10'))
-combo_categoria_despesas['values'] = categoria
 combo_categoria_despesas.place(x=110, y=41)
 
 
-# Despesas
-
+# Calendário Despesas
 label_calendario_despesas = Label(frame3_2, text='Data', font=('Ivy 10'), bg=co1, fg=co4, anchor='nw')
 label_calendario_despesas.place(x=10, y=70)
-calendario_despesa = DateEntry(frame3_2, width=12, background='darkblue', foreground='white', borderwidth=2, year=2023) 
+calendario_despesa = DateEntry(frame3_2, width=12, background='darkblue', foreground='white', borderwidth=2, date_pattern='dd/mm/yyyy') 
 calendario_despesa.place(x=110, y=71)
 
 # Valor
@@ -277,6 +347,66 @@ img_button = ImageTk.PhotoImage(img_button)
 
 button_despesas = Button(frame3_2, image=img_button, text=' Adicionar'.upper(), width=80, compound=LEFT, anchor='nw', font=('Ivy 7 bold'), bg=co1, fg=co0, overrelief=RIDGE)
 button_despesas.place(x=110, y=131)
+
+
+# Botão excluir
+label_excluir_categoria = Label(frame3_2, text='Excluir', font=('Ivy 10 bold'), bg=co1, fg=co4, anchor='nw')
+label_excluir_categoria.place(x=10, y=190)
+
+img_button_delete = Image.open('img/remove.png')
+img_button_delete = img_button_delete.resize((17, 17))
+img_button_delete = ImageTk.PhotoImage(img_button_delete)
+
+button_delete = Button(frame3_2, image=img_button_delete, text=' Excluir'.upper(), width=80, compound=LEFT, anchor='nw', font=('Ivy 7 bold'), bg=co1, fg=co0, overrelief=RIDGE)
+button_delete.place(x=110, y=190)
+
+# Configuração de Receitas
+label_info = Label(frame3_3, text='Insira novas Receitas', font=('Verdana 10 bold'), bg=co1, fg=co4, anchor='nw')
+label_info.place(x=10, y=10)
+
+# Calendário Receitas
+label_calendario_receitas = Label(frame3_3, text='Data', font=('Ivy 10'), bg=co1, fg=co4, anchor='nw')
+label_calendario_receitas.place(x=10, y=40)
+calendario_receita = DateEntry(frame3_3, width=12, background='darkblue', foreground='white', borderwidth=2, date_pattern='dd/mm/yyyy')  
+calendario_receita.place(x=110, y=41)
+
+# Valor Receitas
+
+label_valor_receitas = Label(frame3_3, text='Valor', font=('Ivy 10'), bg=co1, fg=co4, anchor='nw')
+label_valor_receitas.place(x=10, y=70)
+valor_receitas = Entry(frame3_3, width=12, font=('Ivy 10'), justify='left', relief='solid')
+valor_receitas.place(x=110, y=71)
+
+
+# Botão para adicionar receitas
+img_button_receitas = Image.open('img/add.png')
+img_button_receitas = img_button_receitas.resize((17, 17))
+img_button_receitas = ImageTk.PhotoImage(img_button_receitas)
+
+button_receitas = Button(frame3_3, image=img_button_receitas,command=adicionar_receita, text=' Adicionar'.upper(), width=80, compound=LEFT, anchor='nw', font=('Ivy 7 bold'), bg=co1, fg=co0, overrelief=RIDGE)
+button_receitas.place(x=110, y=111)
+
+
+# Configuração inserir nova categoria
+label_info = Label(frame3_3, text='Categoria', font=('Ivy 10'), bg=co1, fg=co4, anchor='nw')
+label_info.place(x=10, y=160)
+
+inserir_categoria = Entry(frame3_3, width=12, font=('Ivy 10'), justify='left', relief='solid')
+inserir_categoria.place(x=110, y=160)
+
+
+# Botão inserir nova categoria
+img_button_categoria = Image.open('img/add.png')
+img_button_categoria = img_button_categoria.resize((17, 17))
+img_button_categoria = ImageTk.PhotoImage(img_button_categoria)
+
+button_categoria = Button(frame3_3, command=adicionar_categoria, image=img_button_categoria, text=' Adicionar'.upper(), width=80, compound=LEFT, anchor='nw', font=('Ivy 7'), bg=co1, fg=co0, overrelief=RIDGE)
+button_categoria.place(x=110, y=190)
+
+
+
+
+
 
 
 
