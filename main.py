@@ -131,7 +131,32 @@ def adicionar_receita():
     resumo()  # Atualiza o resumo
 
 def adicionar_despesa():
+  nome = combo_categoria_despesas.get()  # Obtém o nome da categoria da despesa
+  data = calendario_despesa.get()  # Obtém a data da despesa
+  valor = valor_despesas.get()  # Obtém o valor da despesa
   
+  # Lista com os dados para inserção
+  lista_inserir = [nome, data, valor]
+  
+  # Verifica se algum dos campos está vazio
+  for i in lista_inserir:
+      if i == '':
+          MessageBox.showinfo('Erro', 'Preencha todos os campos')  # Mostra erro se houver campos vazios
+          return
+
+  adicionar_despesa_no_bd(nome, data, valor)  # Chama a função correta para adicionar a despesa ao banco de dados ou sistema de armazenamento
+  
+  MessageBox.showinfo('Sucesso', 'Despesa adicionada com sucesso')
+  
+  combo_categoria_despesas.set('')  # Limpa o campo de categoria
+  valor_despesas.delete(0, END)  # Limpa o campo de valor
+  calendario_despesa.delete(0, END)  # Limpa o campo de data
+  
+  mostrar_renda()  # Atualiza a tabela de renda
+  percentual()  # Atualiza o percentual de gastos
+  grafico_barra()  # Atualiza o gráfico de barras
+  grafico_pizza()  # Atualiza o gráfico de pizza
+  resumo()  # Atualiza o resumo
 
 # FIM Back End - Funções_________________
 
@@ -275,7 +300,7 @@ def mostrar_renda():
     # creating a treeview with dual scrollbars
     tabela_head = ['#Id','Categoria','Data','Quantia']
 
-    lista_itens = [[0,2,3,4],[0,2,3,4],[0,2,3,4],[0,2,3,4]]
+    lista_itens = tabela()
 
     global tree
 
@@ -317,14 +342,21 @@ label_info.place(x=10, y=10)
 label_categoria = Label(frame3_2, text='Categoria', font=('Ivy 10'), bg=co1, fg=co4, anchor='nw')
 label_categoria.place(x=10, y=40)
 
-lista_categoria = ['Viagem', 'Comida']
-categoria = []
+# Aqui você chama a função que busca as categorias no banco de dados
+categorias = ver_categoria()  # Chama a função que retorna as categorias do banco de dados
 
-for i in lista_categoria:
-    categoria.append(i[1]) # Adiciona o valor da categoria
+# Atualiza a lista de categorias com os valores obtidos
+lista_categorias = []
 
+for i in categorias:
+    lista_categorias.append(i[1])  # Adiciona o nome da categoria à lista
+
+# ComboBox de categorias
 combo_categoria_despesas = ttk.Combobox(frame3_2, width=10, font=('Ivy 10'))
 combo_categoria_despesas.place(x=110, y=41)
+
+# Insere as categorias na combobox logo na inicialização
+combo_categoria_despesas['values'] = lista_categorias
 
 
 # Calendário Despesas
@@ -345,7 +377,7 @@ img_button = Image.open('img/add.png')
 img_button = img_button.resize((17, 17))
 img_button = ImageTk.PhotoImage(img_button)
 
-button_despesas = Button(frame3_2, image=img_button, text=' Adicionar'.upper(), width=80, compound=LEFT, anchor='nw', font=('Ivy 7 bold'), bg=co1, fg=co0, overrelief=RIDGE)
+button_despesas = Button(frame3_2,command=adicionar_despesa, image=img_button, text=' Adicionar'.upper(), width=80, compound=LEFT, anchor='nw', font=('Ivy 7 bold'), bg=co1, fg=co0, overrelief=RIDGE)
 button_despesas.place(x=110, y=131)
 
 

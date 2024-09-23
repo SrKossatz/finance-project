@@ -59,6 +59,25 @@ def deletar_despesa(id):
     except lite.Error as e:
         print(f"Erro ao deletar despesa: {e}")
 
+# def deletar():
+#     try:
+#         treev_dados = tree.focus()
+#         treev_dicionario = tree.item(treev_dados)
+#         treev_lista = treev_dicionario['values']
+#         valor = treev_lista[0]
+
+#         deletar_form([valor])
+
+#         messagebox.showinfo('Sucesso', 'Os dados foram deletados com sucesso')
+
+#         for widget in frameDireita.winfo_children():
+#             widget.destroy()
+
+#         mostrar()
+
+#     except IndexError:
+#         messagebox.showerror('Erro', 'Seleciona um dos dados na tabela')
+
 # Consultar dados na base de dados
 def ver_categoria():
     try:
@@ -86,3 +105,36 @@ def ver_despesa():
             return cursor.fetchall()
     except lite.Error as e:
         print(f"Erro ao ver despesa: {e}")
+
+def tabela():
+    gastos = ver_despesa()
+    receitas = ver_receita()
+
+    tabela_lista = []
+
+    for i in gastos:
+        tabela_lista.append(i)
+
+    for i in receitas:
+        tabela_lista.append(i)
+
+    return tabela_lista
+
+# # Função para deletar a categoria
+# def deletar_categoria(nome_categoria):
+#     conn = conectar()
+#     cursor = conn.cursor()
+
+#     try:
+#         # Executa a instrução SQL para deletar a categoria pelo nome
+#         cursor.execute("DELETE FROM categoria WHERE nome = ?", (nome_categoria,))
+#         conn.commit()  # Aplica as alterações
+#         print(f"Categoria '{nome_categoria}' deletada com sucesso!")
+#     except lite.Error as erro:
+#         print(f"Erro ao deletar categoria: {erro}")
+#     finally:
+#         conn.close()  # Fecha a conexão com o banco de dados
+
+# # Exemplo de uso
+# categoria_a_deletar = "Alimentação"  # Substitua pelo nome da categoria que deseja deletar
+# deletar_categoria(categoria_a_deletar)
